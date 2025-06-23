@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JUST LEARN - Programming Courses</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="menu-container">
+      <div class="logo">JUST LEARN</div>
+      <div class="hamburger" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div id="navMenu">
+        <a href="#">Home</a>
+        <a href="#">About</a>
+        <a href="#">Services</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+    <div id="user-info"></div>
+    <button id="login-btn" class="login-btn">Login with Google</button>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>JUST LEARN</h1>
+    <p>Master Programming Languages with Our Video Courses</p>
+    <a href="#pricing" class="btn-primary">Start Learning</a>
+  </section>
+
+  <!-- About Section -->
+  <section class="about">
+    <h2>What You'll Learn</h2>
+    <p>Our video courses cover Python, HTML, CSS, JavaScript, and more.</p>
+    <img src="https://placehold.co/800x400?text=Course+Preview" alt="Video Preview" />
+  </section>
+
+  <!-- Pricing Section -->
+  <section id="pricing" class="pricing">
+    <h2>Pricing</h2>
+    <p>Access all video lessons for just <span class="price">$29.99</span></p>
+    <a href="https://buy.stripe.com/6oUeVd28w8En0L23r39k400" class="btn-secondary">Buy Now</a>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="contact">
+    <h2>Have Questions?</h2>
+    <p>Email us at <a href="mailto:justlearn@example.com">justlearn@example.com</a></p>
+  </section>
+
+  <footer>
+    &copy; 2025 JUST LEARN. All rights reserved.
+  </footer>
+
+  <!-- Firebase + Google Auth -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRZSKBoKjtJgZdWUwvPKwDiL0ZBR7BWEI",
+      authDomain: "just-learn-1.firebaseapp.com",
+      projectId: "just-learn-1",
+      storageBucket: "just-learn-1.appspot.com",
+      messagingSenderId: "100113298256",
+      appId: "1:100113298256:web:d4c222a4ed7842c93c7255",
+      measurementId: "G-G4NGBD7PTJ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    const loginBtn = document.getElementById('login-btn');
+    const userInfo = document.getElementById('user-info');
+
+    loginBtn.addEventListener('click', () => {
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          const user = result.user;
+          updateUI(user);
+        })
+        .catch((error) => {
+          console.error('Error during sign-in:', error.message);
+          alert('Sign in failed: ' + error.message);
+        });
+    });
+
+    function updateUI(user) {
+      userInfo.innerHTML = `
+        <div class="user-display">
+          <img src="${user.photoURL}" alt="${user.displayName}" class="user-pic">
+          <span>Welcome, ${user.displayName}</span>
+          <button id="logout-btn" class="logout-btn">Logout</button>
+        </div>
+      `;
+      loginBtn.style.display = 'none';
+
+      document.getElementById('logout-btn').addEventListener('click', () => {
+        signOut(auth).then(() => {
+          userInfo.innerHTML = '';
+          loginBtn.style.display = 'inline-block';
+        });
+      });
+    }
+
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        updateUI(user);
+      }
+    });
+  </script>
+
+  <script>
+    function toggleMenu() {
+      document.getElementById('navMenu').classList.toggle('show');
+    }
+  </script>
+
+</body>
+</html>
