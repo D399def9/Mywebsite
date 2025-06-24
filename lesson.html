@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JUST LEARN - Lesson</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <!-- Video Section -->
+    <div class="video-section">
+      <video id="lesson-video" controls></video>
+    </div>
+
+    <!-- Code Editor Section -->
+    <div class="editor-section">
+      <textarea id="code-editor">// Your code will appear here</textarea>
+      <button onclick="runCode()">Run</button>
+      <iframe id="output-frame"></iframe>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
