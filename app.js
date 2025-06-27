@@ -1,39 +1,67 @@
 // app.js
-import { db, doc, getDoc, query, collection, where, getDocs } from './firebase.js';
+import { db } from './firebase.js';
+import {
+  doc,
+  getDoc,
+  query,
+  collection,
+  where,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-const titleEl = document.getElementById('lesson-title');
-const videoEl = document.getElementById('video');
-const editor = document.getElementById('editor');
-const preview = document.getElementById('preview');
+const lessonTitleEl = document.getElementById("lesson-title");
+const videoEl = document.getElementById("video");
+const editorEl = document.getElementById("editor");
+const nextBtn = document.getElementById("next-lesson-btn");
 
-// Get lesson ID from URL
-const params = new URLSearchParams(window.location.search);
-const lessonId = params.get('id') || 'lesson1';
+let currentLessonNumber = 1;
+const lessonId = new URLSearchParams(window.location.search).get("id") || "lesson1";
 
-async function loadLesson(id) {
-  const docRef = doc(db, "lessons", id);
+console.log("🔁 Starting app.js, lessonId =", lessonId);
+
+async function loadLesson() {
+  console.log("Loading lesson:", lessonId);
+  const docRef = doc(db, "lessons", lessonId);
   const docSnap = await getDoc(docRef);
-
+  
   if (docSnap.exists()) {
     const data = docSnap.data();
-    titleEl.textContent = data.title;
+    console.log("✅ Data received:", data);
+
+    lessonTitleEl.textContent = data.title;
     videoEl.src = data.videoUrl;
-    editor.value = data.defaultCode;
+    editorEl.value = data.code || data.defaultCode || "";
+    currentLessonNumber = data.lessonNumber || 1;
+
+    console.log("📌 Editor content set to:", editorEl.value);
+
   } else {
-    titleEl.textContent = "Lesson not found.";
+    console.error("❌ Lesson document not found:", lessonId);
+    lessonTitleEl.textContent = "Lesson not found.";
   }
 }
 
-window.runCode = function () {
-  const html = editor.value;
-  const doc = preview.contentDocument || preview.contentWindow.document;
-  doc.open();
-  doc.write(html);
-  doc.close();
+window.runCode = () => {
+  console.log("▶️ Running code:", editorEl.value);
+  document.getElementById("preview").srcdoc = editorEl.value;
 };
 
-loadLesson(lessonId);
-setDoc(doc(db, "users", user.uid, "completedLessons", lessonId), {
-  completed: true,
-  timestamp: serverTimestamp()
-});
+if (nextBtn) {
+  nextBtn.addEventListener("click", async () => {
+    console.log("➡️ Next button clicked from lesson", currentLessonNumber);
+    const q = query(
+      collection(db, "lessons"),
+      where("lessonNumber", "==", currentLessonNumber + 1)
+    );
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      const nextDoc = snap.docs[0];
+      console.log("➡️ Next lesson found:", nextDoc.id);
+      window.location.href = `lesson.html?id=${nextDoc.id}`;
+    } else {
+      alert("This was the last lesson!");
+    }
+  });
+}
+
+loadLesson();
